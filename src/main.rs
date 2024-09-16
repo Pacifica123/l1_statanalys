@@ -36,9 +36,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>>{
     utils::print_intervals(&merged_intervals, &merged_frequencies, &new_rel_frequencies);
 
     // Визуализация
-    let heights = calculate::calculate_histogram_heights(&merged_intervals, &new_rel_frequencies);
-    let midpoints = calculate::calculate_interval_midpoints(&merged_intervals);
-    graphix::plot_histogram_and_polygon(&heights, &merged_intervals, &midpoints)?;
+    // (тут странно)
+    // let heights = calculate::calculate_histogram_heights(&merged_intervals, &new_rel_frequencies);
+    // let offset_midpoints = calculate::calculate_interval_midpoints(&merged_intervals);
+    // graphix::plot_histogram_and_polygon(&heights, &merged_intervals, &offset_midpoints)?;
+
+    let old_hs = calculate::calculate_histogram_heights(&intervals, &rel_frequencies);
+    let midpoints = calculate::calculate_interval_midpoints(&intervals);
+    graphix::plot_histogram_and_polygon(&old_hs, &intervals, &midpoints)?;
 
     Ok(())
 }
