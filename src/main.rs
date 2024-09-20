@@ -21,6 +21,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>>{
     let range = utils::range(&data);
     println!("Размах выборки: {:.3}", range);
 
+    let mean = utils::mean(&data);
+    let std_dev = utils::std_dev(&data, mean);
+    println!("Среднее значение: {:.3} | Ср.кв. отклонение: {:.3}", mean, std_dev);
+
     // Интервалы
     let num_intervals = utils::sturges_intervals(n);
     let intervals = utils::create_intervals(&data, num_intervals);
@@ -37,13 +41,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>>{
 
     // Визуализация
     // (тут странно)
-    // let heights = calculate::calculate_histogram_heights(&merged_intervals, &new_rel_frequencies);
-    // let offset_midpoints = calculate::calculate_interval_midpoints(&merged_intervals);
-    // graphix::plot_histogram_and_polygon(&heights, &merged_intervals, &offset_midpoints)?;
+    let heights = calculate::calculate_histogram_heights(&merged_intervals, &new_rel_frequencies);
+    let offset_midpoints = calculate::calculate_interval_midpoints(&merged_intervals);
+    graphix::plot_histogram_and_polygon(&heights, &merged_intervals, &offset_midpoints, mean, std_dev)?;
 
-    let old_hs = calculate::calculate_histogram_heights(&intervals, &rel_frequencies);
-    let midpoints = calculate::calculate_interval_midpoints(&intervals);
-    graphix::plot_histogram_and_polygon(&old_hs, &intervals, &midpoints)?;
+    // let old_hs = calculate::calculate_histogram_heights(&intervals, &rel_frequencies);
+    // let midpoints = calculate::calculate_interval_midpoints(&intervals);
+    // graphix::plot_histogram_and_polygon(&old_hs, &intervals, &midpoints, mean, std_dev)?;
+    let hi2 = calculate::calculate_hi_square(&frequencies, &intervals, n, mean, std_dev);
+    let hi2_merged = calculate::calculate_hi_square(&merged_frequencies, &merged_intervals, n, mean, std_dev);
+    println!("Критерий пирсона для не объединенных: {}", hi2);
+    println!("Критерий пирсона для объединенных: {}", hi2_merged); 
 
     Ok(())
 }

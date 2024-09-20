@@ -1,5 +1,7 @@
 use plotters::prelude::*;
 
+use crate::calculate::calculate_normal_distr_y;
+
 
 fn format_label(v: &f64) -> String {
     format!("{:.2}", v)
@@ -8,7 +10,10 @@ fn format_label(v: &f64) -> String {
 pub(crate) fn plot_histogram_and_polygon(
     histogram: &[f64],
     intervals: &[(f64, f64)],
-    midpoints: &[f64]
+    midpoints: &[f64],
+    // для теоретического:
+    mean: f64,   
+    std_dev: f64 
 ) -> Result<(), Box<dyn std::error::Error>> {
     // Вычисляем минимальные и максимальные значения по интервалам
     let min_x = intervals.iter().map(|&(lower, _)| lower).fold(f64::INFINITY, f64::min);
@@ -68,21 +73,6 @@ pub(crate) fn plot_histogram_and_polygon(
             Text::new(format_label(&label), (min_x - 0.1, label), ("sans-serif", 15).into_font())
         ))?;
     }
-    // Настройка сетки с отметками
-    // chart.configure_mesh()
-    // .x_labels(intervals.len()) // Устанавливаем количество меток по оси X
-    // .x_label_formatter(&format_label) // Форматируем метки по оси X
-    // .y_labels(10) // Устанавливаем количество меток по оси Y
-    // .y_label_formatter(&format_label) // Форматируем метки по оси Y
-    // .draw()?;
-    // Настройка сетки с отметками
-    // chart.configure_mesh()
-    // .x_labels(x_labels.len()) // Устанавливаем количество меток по оси X
-    // .x_label_formatter(&|v| format_label(v)) // Форматируем метки по оси X
-    // .y_labels(y_labels.len()) // Устанавливаем количество меток по оси Y
-    // .y_label_formatter(&|v| format_label(v)) // Форматируем метки по оси Y
-    // .draw()?;
-
 
     
     // Plot polygon with thicker line
@@ -100,7 +90,35 @@ pub(crate) fn plot_histogram_and_polygon(
         },
     ))?;
 
-    // Highlight the points with PointSeries
+    // Построение теоретической кривой нормального распределения
+    let normal_points: Vec<(f64, f64)> = midpoints.iter()
+        .map(|&x| {
+            let y = calculate_normal_distr_y(x, mean, std_dev); // Используем функцию для нормального распределения
+            (x, y)
+        })
+        .collect();
+    chart.draw_series(LineSeries::new(
+        normal_points.iter().cloned(),
+        ShapeStyle {
+            color: BLACK.to_rgba(),
+            filled: false,
+            stroke_width: 3,
+        },
+    ))?;
+    chart.draw_series(PointSeries::of_element(
+        normal_points.iter().cloned(),
+        5, // Размер маркера
+        BLACK.to_rgba(),
+        &|c, s, st| {
+            Circle::new(c, s, ShapeStyle {
+                color: BLACK.to_rgba(),
+                filled: true,
+                stroke_width: 2,
+            })
+        },
+    ))?;
+
+    
     chart.draw_series(PointSeries::of_element(
         polygon_points.iter().cloned(),
         5, // Размер маркера

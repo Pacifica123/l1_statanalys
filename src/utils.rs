@@ -90,3 +90,13 @@ pub(crate) fn print_intervals(intervals: &Vec<(f64, f64)>, frequencies: &Vec<usi
         println!("{:<20} {:<15} {:<15.2}", format!("[{:.2}, {:.2}]", start, end), frequency, rel_frequency);
     }
 }
+
+pub(crate) fn mean(data: &[f64]) -> f64 {
+    let sum: f64 = data.iter().sum();
+    sum / data.len() as f64
+}
+
+pub(crate) fn std_dev(data: &[f64], mean: f64) -> f64 {
+    let variance = data.iter().map(|&x| (x - mean).powi(2)).sum::<f64>() / data.len() as f64;
+    variance.sqrt()
+}
