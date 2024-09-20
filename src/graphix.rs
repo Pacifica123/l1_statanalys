@@ -1,3 +1,4 @@
+use full_palette::GREY_A100;
 use plotters::prelude::*;
 
 use crate::calculate::calculate_normal_distr_y;
@@ -50,7 +51,7 @@ pub(crate) fn plot_histogram_and_polygon(
     for (i, &height) in histogram.iter().enumerate() {
         let (lower, upper) = intervals[i];
         chart.draw_series(vec![
-            Rectangle::new([(lower, 0.0), (upper, height)], BLUE.filled())
+            Rectangle::new([(lower, 0.0), (upper, height)], GREY_A100.filled())
         ])?;
     }
 
